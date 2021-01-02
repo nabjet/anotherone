@@ -1,9 +1,11 @@
-extimate <- function(y_val,z_mat,w_mat)
+extimate <- function(matdata)
 { library(MASS)
-  const_vec <- ginv(t(z_mat[,1]) %*% z_mat[,1]) %*% t(z_mat[,1]) %*% y_val # inverse of term in first bracket
-  const_vec <- const_vec[1] # the intercept
-  B1 <- ginv(t(w_mat) %*% z_mat[,2]) %*% t(w_mat) %*% y_val # b1
-  matrix(c(const_vec[1],B1), nrow = 2, ncol = 1)
+  z_mat <- matdata[,c(1,3)]## column of ones and z column to z_mat
+  const_vec <- ginv(t(z_mat) %*% z_mat) %*% t(z_mat) %*% matdata[,2] # inverse of term in first bracket
+  intercept <- const_vec[1] # the intercept
+  Z <- cov(matdata[,2],matdata[,4])/cov(matdata[,3],matdata[,4])
+  data.frame(intercept,Z)
+  
 } 
 
 data_gen <- function()
@@ -15,8 +17,14 @@ data_gen <- function()
   w <- rnorm ( n , mean=0, sd=1)
   z <- 0.2 * w + v
   y <- 1 + 0.5 * z + eps 
-  data_to <- data.frame(y,z,w)
-  data_to
+  data_to_1 <- matrix(c(rep(1,n),y,z,w), nrow = 100, ncol = 4)## returns a matrix
+  data_to_2 <- data.frame(y,z,w) 
+  list(data_to_1,data_to_2)
 }
 
+## source script and assign data_gen to any variable e-g vals
+## run extimate <- extimate(may[[1]])
+##  extimate ## this allows viewing of contents of extimate
+## run ivreg(formula = y ~ z | w, data = may[[2]]) to view 
+## ivreg parameters and compare
 
