@@ -4,6 +4,8 @@ remove(list = ls()) #clear the environment
 library(dplyr)
 library(rstudioapi)
 library(tidyr)
+library(ggplot2)
+library(data.table)
 
 #Set working directory
 #current_path <- getActiveDocumentContext()$path
@@ -101,9 +103,20 @@ Employment <- Employment %>% slice(105:390)
 
 
 
+## Answer to question 11
+Count_1 <- Employment %>% filter(Employment$Country == 'Germany') ## selection GErmany
+Count_2 <- Employment %>% filter(Employment$Country == 'Bulgaria')
+Count_1 <- Count_1[,-c(1,3)]
+Count_2 <- Count_2[,-c(1,3)]
+colnames(Count_2) <- c('Quarters', 'Bulgaria')
+colnames(Count_1) <- c('Quarters', 'Germany')
+PlotData <- merge(Count_1,Count_2,by = 'Quarters')
+PlotData <- gather(PlotData,key = 'Country',value = 'change', -Quarters)
+## plot
+ggplot(data = PlotData, aes(x = Quarters,y = change )) +geom_path(aes(color = Country),group = 'quarters',na.rm = TRUE) + scale_color_manual(values = c('darkred','blue'))
 
 
-
+## Question 12
 #Overview of DataSet
 #dim(E)
 #class(E)
